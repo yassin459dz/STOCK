@@ -45,13 +45,13 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Group::make()->columns(3)->schema([
+                Group::make()->schema([
                     Section::make('products')->schema([
                     TextInput::make('products')
                     ->required()
                     ->maxLength(255),
-                    ])->columnSpan(1)
-            ])->columns(3)
+                    ])
+            ])->columnSpanFull()
         ]);
     }
 

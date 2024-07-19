@@ -12,7 +12,10 @@ class TransactionRest extends BaseWidget
     {
         return [
 
-            Stat::make('Retourné' , Transaction::query()->where('rest', '0')->count()),
+            Stat::make('Retourne Complete' , Transaction::query()->where('rest', '0')->count()),
+            Stat::make('Retourné To AM', Transaction::query()->where('li_seleft', 'AM')->sum('raja3t')),
+            Stat::make('Retourné To DZ', Transaction::query()->where('li_seleft', 'DZ')->sum('raja3t')),
+
             Stat::make('AM TO DZ', Transaction::query()->where('li_seleft', 'AM')->sum('rest')),
             Stat::make('DZ TO AM', Transaction::query()->where('li_seleft', 'DZ')->sum('rest'))->color('danger'),
 

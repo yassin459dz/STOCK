@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
-            $table->integer('rest')->default(0)->after('validate');
+            $table->integer('raja3t')->default(0)->after('validate');
 
         });
     }
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
-            $table->dropColumn('phone');
+            $table->dropColumn('raja3t');
         });
     }
 };

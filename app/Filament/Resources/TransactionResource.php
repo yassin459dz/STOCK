@@ -28,6 +28,8 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\SelectColumn;
+use Filament\Tables\Columns\CheckboxColumn;
+
 use Filament\Forms\Components\FileUpload\recorderable ;
 use Filament\Tables\Filters\SelectFilter;
 use Schema;
@@ -64,17 +66,21 @@ class TransactionResource extends Resource
                  ->required()
                  ->searchable()
                  ->preload()
-                 ->relationship('Product' , 'products'),
+                 ->relationship('Product' , 'products')->columnSpanFull(),
 
 
                  TextInput::make('qte')
                  ->required()
                  ->numeric()
                  ->default(1)
-                 ->minValue(1),
+                 ->minValue(1)->columnSpanFull(),
 
+                 TextInput::make('raja3t')
+                 ->numeric()
+                 ->default(0)
+                 ->minValue(0)->columnSpanFull(),
 
-
+                 Group::make()->schema([
                         ToggleButtons::make('li_seleft')
                         ->inline()
                         ->required()
@@ -87,16 +93,14 @@ class TransactionResource extends Resource
                             'DZ' => 'danger'
                         ]),
 
-                                            // TextInput::make('li_seleft')
-                    //     ->required()
-                    //    // ->default('AM')
-                    //     ->maxLength(255)
-                    //     ->default('AM'),
-                    // TextInput::make('el_mostafid')
-                    // // ->default('DZ')
-                    //  ->required()
-                    //  ->maxLength(255)
-                    //  ->default('DZ'),
+                        TextInput::make('li_seleft')
+                        ->maxLength(255)
+                        ->reactive(),
+
+                        TextInput::make('el_mostafid')
+                        ->maxLength(255)
+                        ->disabled(fn ($get) => $get('li_seleft') === null),
+                ])->columns(3),
 
                     TextInput::make('note')
                         ->maxLength(255)->columnSpanFull(),
@@ -119,48 +123,71 @@ class TransactionResource extends Resource
                 ->color('success')
                 ->sortable(),
 
+
                 Tables\Columns\TextColumn::make('li_seleft')
-                    ->searchable()
-
-                    ->badge()
-                    ->color(fn (string $state):string => match($state){
-                        'AM' => 'info',
-                    'DZ' => 'danger'})
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('el_mostafid')
                 ->searchable()
                 ->badge()
-                ->color(fn (string $state):string => match($state){
+                ->color(fn (string $state): string => match($state) {
                     'AM' => 'info',
-                'DZ' => 'danger'})
+                    'DZ' => 'danger',
+                    default => 'primary', // Replace with your default color
+                })
                 ->sortable(),
+
+            Tables\Columns\TextColumn::make('el_mostafid')
+                ->searchable()
+                ->badge()
+                ->color(fn (string $state): string => match($state) {
+                    'AM' => 'info',
+                    'DZ' => 'danger',
+                    default => 'primary', // Replace with your default color
+                })
+                ->sortable(),
+
+
                 Tables\Columns\TextColumn::make('qte')
                 ->numeric()
                 ->badge()
                 ->sortable(),
+
+                Tables\Columns\TextColumn::make('raja3t')
+                ->numeric()
+                ->badge()
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('rest')
+                ->label('REST')
+                ->numeric()
+                ->badge()
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+
+
                 Tables\Columns\TextColumn::make('note')
                 ->searchable()
                 ->sortable()
                 ->words(2),
 
-                SelectColumn::make('validate')
-                ->sortable()
-                ->options([
-                    'verified' => 'Retourn',
-                    'Non_verified' => 'Non Retourn',
-                ])
+
+
+                CheckboxColumn::make('ok')
+                ->label('C Bon')
                 ->afterStateUpdated(function ($state, $record) {
                     Log::info('State updated', ['state' => $state, 'record' => $record]);
 
-                    if ($state === 'verified') {
+                    if ($state) {
                         $record->rest = 0;
-                    } elseif ($state === 'Non_verified') {
-                        $record->rest = $record->qte;
+                        $record->raja3t = $record->qte;
+                    } else {
+                        $record->raja3t = $record->previousRaja3t;
                     }
 
                     $record->save();
-                }),
+                })
+                ->default(fn ($record) => $record->rest === 0)
+                ->sortable(),
+
 
                 Tables\Columns\TextColumn::make('updated_at')
                 ->dateTime()
